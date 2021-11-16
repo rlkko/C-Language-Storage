@@ -1,5 +1,7 @@
-// Exercises.cpp : Este arquivo contém a função 'main'. A execução do programa começa e termina ali.
-//
+//SumOfAllPerfect Squares.cpp
+/*given a integer 0 <=N<= 1000, determine whether N can be expressed as (a + b + c + d) where a,b,c,d are perfect squares
+/ eg.18 is true because 9+9+0+0 or 16+1+1+0
+*/
 
 #include <iostream>
 #include <map>
