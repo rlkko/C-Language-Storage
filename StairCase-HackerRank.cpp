@@ -15,10 +15,6 @@ Write a program that prints a staircase of size n .
 */
 
 #include <iostream>
-#include <map>
-#include <vector>
-#include <math.h>
-
 
 void staircase(int n) {
 		int charNum = 1;
