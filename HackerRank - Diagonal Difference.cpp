@@ -1,4 +1,4 @@
-// Exercises.cpp : Este arquivo contém a função 'main'. A execução do programa começa e termina ali.
+// Exercises.cpp : O(n2) - Quadratic
 /*
 Given a square matrix, calculate the absolute difference between the sums of its diagonals.
 
