@@ -4,13 +4,10 @@
 //greatest common divisor
 
 long long GCD(long a,long b) {
-	long best = 0;
-	for (int i = 0; i < (a + b); i++) {
-		if (a % i == 0 && b % i == 0) {
-			best = i;
-		}
-	}
-	return best;
+	if(b==0) return a;
+	
+	int r = a % b;
+	return GCD(a,r);
 }
 
 int main()
