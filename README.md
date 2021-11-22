@@ -1,10 +1,9 @@
-# Competititve-programing-exercises
+# 💻 Competitive Programming Exercises
 
+This is the place where i want to show and try to learn from the best the most efficient algorithms
 
-This is my little corner where I store my competitive programming files to look back one day
+## 🔧 Contributing
+Pull requests are welcome. I'm always trying to get better as a programmer.
 
-With the .cpp file i include the Question and my personal answer, i'm always open to sugestions and tips.
-
-1- Sum of all Perfect squares
-
-Thats all!
+Please make sure to check out my BigO notation folder, where I explain the different types of algorithms and a way to quantify performance as a input 
+size becomes arbitrary large there is and how to identify them.
