@@ -48,6 +48,16 @@ int searchVertical(char board[][TABLE_SIZE],int index,char ch){
 	return counter == TABLE_SIZE;
 }
 
+/*
+searchHorizontal is too redundant,
+can be optimized easily using:
+char v[] = {ch};
+return strcspn(board,v) >=3;
+
+Which works but i need to rewrite the change turn function
+since theres a weird bug that gives the win to the wrong player
+*/
+
 int searchHorizontal(char board[],char ch){
 	//Compares the 3 char bytes for duplicates
 	char temp[TABLE_SIZE];
