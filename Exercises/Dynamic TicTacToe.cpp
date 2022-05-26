@@ -39,7 +39,7 @@ int searchDiagonal(char board[TABLE_SIZE][TABLE_SIZE],char ch){
 }
 
 int searchVertical(char board[][TABLE_SIZE],int index,char ch){	
-	//Checks the placed mark's row
+	//Checks the placed mark's column
 	int i=0,counter=0;
 	
 	while(board[i++][index] == ch)
