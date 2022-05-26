@@ -6,7 +6,7 @@
 
  #include <stdio.h>
  #include <String.h>
-
+ #include <stdlib.h>
  #define TABLE_SIZE 3
 
 
