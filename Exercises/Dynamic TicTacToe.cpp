@@ -80,7 +80,7 @@ void showboard(char board[TABLE_SIZE][TABLE_SIZE]){
 		
 		//Check if last and draw line
 		if(boardY != TABLE_SIZE-1) 
-			printf("\n--------\n",boardY);
+			printf("\n--------\n");
 	}
 	putchar('\n');
 }
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 	resetboard(board);
 
 	//initialize all game variables	
-	char message[20] = "TicTacToe time!\n";
+	char message[50] = "TicTacToe time!\n";
 	short row,col;
 
 	do{
