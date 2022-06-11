@@ -3,15 +3,15 @@
 
 int main(int argc, char *argv[]) 
 {
-  //Array and variables
-  int arr[] = {6,7,8,2,7};
+  int arr[] = {6,1,8,2,7};
   //each digit goes from 0-9
   int seen[10] = {0};
-  int i,j;
+  int start,end;
 
-  for(i = 0,j = (sizeof(arr) / sizeof(int)) ;i < j;i++,j--)
+  for(start = 0,end = (sizeof(arr) / sizeof(int)) ;start < end;start++,end--)
   {
-    if(++seen[arr[i]] >= 2 || ++seen[arr[j]] >= 2){
+    //if the number was seen before, leave the loop
+    if(seen[arr[start]]++ || seen[arr[end]]++){
       printf("Yes \n");
       break;
     }  
