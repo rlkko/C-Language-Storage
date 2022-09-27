@@ -1,4 +1,4 @@
-#Small Projects
+**Small Projects**
 
 This is the backup for the small achievements
 
@@ -8,6 +8,8 @@ LIST:
 
 Dynamic tictactoe - A version of tictactoe that works in almost every matrix size
 
-Player creator for fighting game - to be added to the fighting game in a future update
+![](https://user-images.githubusercontent.com/93994704/192632993-320ef69c-f73d-4dc5-9615-613d2ad4bf79.png)
 
 Staff with file handle - using file read and writes to add, editing and removing data from a .bin file
+
+![image](https://user-images.githubusercontent.com/93994704/192633692-1884d6a2-9739-41a4-a57f-19f215199542.png)
