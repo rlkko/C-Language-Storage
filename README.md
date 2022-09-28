@@ -1,4 +1,4 @@
-# 💻 Competitive Programming Exercises
+# 💻 C programming corner
 
 This is the place where i want to show and try to learn from the best the most efficient algorithms
 
