@@ -1,6 +1,6 @@
 // FILE_NAME.C
 // made by rikko
-#define NAME_MAX_LENGTH 30
+#define MAX_NAME_LENGTH 30
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,11 +11,11 @@
 
 typedef struct
 {
-  char name[NAME_MAX_LENGTH];
+  char name[MAX_NAME_LENGTH];
   uint16_t age;
   double wage;
   // deleted = '*' -> deleted
-  char deleted;
+  bool deleted;
 } Person;
 
 typedef struct Archive
@@ -34,56 +34,46 @@ const uint16_t MAX_LEADERBOARD_NUM = 5;
 // regex script to clear the screen in powershell
 #define clrscr() printf("\e[1;1H\e[2J")
 
-enum deleted
-{
-  yes = 1,
-  no = 0
-};
-
 // EXTRA FUNCTIONS
 
 void read_name(char *message, Person *p)
 {
   puts(message);
-  fgets(p->name, 29, stdin);
+  fgets(p->name, MAX_NAME_LENGTH, stdin);
 }
 
 void read_age(const char *message, Person *p)
 {
   puts(message);
-  scanf(" %hu", &(p->age));
+  scanf(" %hu", &p->age);
 }
 
 void read_wage(const char *message, Person *p)
 {
   puts(message);
-  scanf(" %lf", &(p->wage));
+  scanf(" %lf", &p->wage);
 }
 
-FILE *create_fhandle(const char *fail_message)
+FILE *create_fhandle(const char *fail_message, const char *mode)
 {
-  if ((fopen(FILE_NAME, "w+b")) == NULL)
+  FILE *fh;
+  if ((fh = fopen(FILE_NAME, mode)) == NULL)
+  {
     puts(fail_message);
+    fclose(fh);
+  }
 
-  return fopen(FILE_NAME, "w+b");
+  return fh;
 }
 
-FILE *create_load_fhandle(const char *fail_message)
-{
-  if ((fopen(FILE_NAME, "r+b")) == NULL)
-    puts(fail_message);
-
-  return fopen(FILE_NAME, "r+b");
-}
-
-void Insert(Person p)
+static inline void Insert(Person p)
 {
   list.p[list.counter++] = p;
 };
 
 static inline void Inic()
 {
-  list.counter = -1;
+  list.counter = 0;
 }
 
 void search_name()
@@ -92,9 +82,8 @@ void search_name()
   puts("Input your search term:");
   fgets(user_input, 30, stdin);
 
-  int i;
-  for (i = 0; i <= list.counter; i++)
-    if (memcmp(user_input, list.p[i].name, NAME_MAX_LENGTH) == 0)
+  for (int i = 0; i <= list.counter; i++)
+    if (memcmp(user_input, list.p[i].name, MAX_NAME_LENGTH) == 0)
     {
       printf("%s was found and has %hu years old!", user_input, list.p[i].age);
       break;
@@ -105,9 +94,7 @@ void show_leaderboard(const char *message)
 {
   puts(message);
 
-  int32_t i;
-
-  for (i = 0; i < list.counter; i++)
+  for (int i = 0; i < list.counter; i++)
     if (i < MAX_LEADERBOARD_NUM && !list.p[i].deleted)
       printf("%d | %s", i, list.p[i].name, list.p[i].age);
 }
@@ -115,46 +102,39 @@ void show_leaderboard(const char *message)
 // Displays the full reg content
 void show_full_list()
 {
-  long i;
-  Person *ptr;
-
   if (list.counter == 0)
+  {
     puts("The list is empty!");
+    return;
+  }
 
   // read and print the whole group of people
-  for (ptr = list.p, i = 0; i < list.counter; ptr++, i++)
+  for (int i = 0; i < list.counter; i++)
     printf("%ld - %15s [ %3hu y.o | makes %6.2lf | Banned:%d ]\n", i, list.p[i].name, list.p[i].age, list.p[i].wage, list.p[i].deleted);
 }
 
 // reads data from file
 void data_Load(const char *fail_message)
 {
-  Person p;
+  FILE *file_stream = create_fhandle(fail_message, "rb");
 
-  FILE *file_stream = create_load_fhandle(fail_message);
-
-  while ((fread(&p, sizeof(Person), 1, file_stream)))
-    Insert(p);
+  fread(&list, sizeof(Archive), 1, file_stream);
 
   fclose(file_stream);
   // printf("Data read: %zu \n", read_data);
 }
 
 // writes data back to the file
-void data_Save(const char *fail_message)
+void data_Save()
 {
-  FILE *file_stream = create_fhandle(fail_message);
+  FILE *file_stream = create_fhandle(NULL, "w+b");
 
-  int i;
-  for (i = 0; i <= list.counter; i++)
-    if ((fwrite(&list.p[i], sizeof(Person), 1, file_stream)) == 0)
-      puts("wrote zero");
+  if (list.counter > 0)
+    fwrite(&list, sizeof(Archive), 1, file_stream);
 
   fclose(file_stream);
-
   // printf("Data written: %zu \n", written_data);
 }
-
 void register_insert()
 {
   Person p;
@@ -165,7 +145,7 @@ void register_insert()
 
   read_wage("Wage: ", &p);
 
-  p.deleted = no;
+  p.deleted = false;
 
   Insert(p);
 }
@@ -211,12 +191,12 @@ void register_change(const char *message_fail)
     break;
   case '4':
     // User delete / recover
-    p->deleted = yes ? no : yes;
+    p->deleted = !p->deleted;
     break;
   default:
     return;
   }
-  data_Save("DATA SAVE FAILED");
+  data_Save();
   // retrieve back the data
 };
 
@@ -229,7 +209,7 @@ void register_delete(const char *fail_message)
   if ((scanf(" %ld", &id)) == 0)
     puts(fail_message);
 
-  list.p[id].deleted = yes;
+  list.p[id].deleted = true;
 };
 
 void register_search(const Archive *archive)
@@ -274,21 +254,21 @@ int main()
   data_Load("Failed to load");
 
   char escolha = -1;
-  clrscr();
 
   while (true)
   {
     show_leaderboard("Welcome!");
-    printf("\nTheres %ld registers in the list\n", list.counter);
-    puts("\n1. Insert Register");
-    puts("2. Change Register");
-    puts("3. Delete Register");
-    puts("4. Full Reg. list ");
-    puts("5. Search");
-    puts("0. Exit\n");
+    printf("\nTheres %ld registers in the list\n"
+           "\n1. Insert Register\n"
+           "2. Change Register\n"
+           "3. Delete Register\n"
+           "4. Full Reg. list\n"
+           "5. Search\n"
+           "0. Exit\n",
+           list.counter);
 
     scanf(" %c%*c", &escolha);
-    printf("How many in the list %ld\n", list.counter);
+
     switch (escolha)
     {
     case '1':
