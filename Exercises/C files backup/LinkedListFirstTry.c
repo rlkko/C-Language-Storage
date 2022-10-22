@@ -13,9 +13,27 @@ typedef struct node
 
 void printlist(Node *head)
 {
-  // Runs through while theres no null 'next' attribute
-  for (Node *tmp = head; tmp->next != NULL; tmp = tmp->next)
+  // Run through the list, prints counter
+  int counter;
+
+  // tmp and head ptr share the same list structure, tmp gets deallocated
+  Node *tmp;
+  for (counter = 0, tmp = head; tmp != NULL; counter++, tmp = tmp->next)
     printf("%d - ", tmp->value);
+
+  printf("%d items\n", counter);
+}
+
+void insert_start(Node **head, int value)
+{
+  Node *newNode = (Node *)malloc(sizeof(Node));
+  newNode->value = value;
+
+  // point the next node to head
+  newNode->next = *head;
+
+  // Change the head from the old to the new start
+  *head = newNode;
 }
 
 void insert_end(Node **head, int value)
@@ -46,8 +64,24 @@ void insert_end(Node **head, int value)
   curr->next = tmp;
 }
 
+Node *BuildTwoThree()
+{
+  Node *head = (Node *)malloc(sizeof(Node)); // Allocate 2 nodes in the heap
+  Node *three = (Node *)malloc(sizeof(Node));
+
+  // Setup the nodes
+  head->next = three;
+  head->value = 2;
+  three->next = NULL;
+  three->value = 3;
+
+  // At this point the linked list is referenced by head
+  return head;
+}
+
 int main()
 {
+  // Node *head = BuildTwoThree();
   // Where the linked list starts
   Node *head = NULL;
 
