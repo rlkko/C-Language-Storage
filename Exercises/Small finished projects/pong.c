@@ -1,4 +1,4 @@
-// snake_game.C
+﻿// snake_game.C
 // made by rikko
 #include <stdio.h>
 #include <conio.h>
@@ -12,41 +12,62 @@
 #define HEIGHT 30
 #define WIDTH 60
 
-typedef struct ball {
+//maybe the boxes will be dynamic i can remove and add more?
+typedef struct box {
+	int width;
 	int x, y;
+}Box;
+
+struct {
+	int x, y, tail, head;
+	char body_symbol;
+} paddle;
+
+struct {
+	int x, y, velocity, speed_multiplier;
 	char symbol;
-}Ball;
+} ball;
 
-
-int x, y, tail, head, var, dir = 'd';
-
-int Field[HEIGHT][WIDTH] = { 0 };
+//general purpose variables
 bool game_status = false;
-Ball ball;
+int var;
+
+//2D environment
+int Field[HEIGHT][WIDTH] = { 0 };
 
 void init() {
 	//setup basic properties
-	x = WIDTH / 2, y = HEIGHT - 2, tail = 1, head = 5;
-	int* start_pos = &Field[y][x - head];
+	paddle.x = WIDTH / 2;
+	paddle.y = HEIGHT - 2;
+	paddle.tail = 1;
+	paddle.head = 5;
+
+	int* start_pos = &Field[paddle.y][paddle.x - paddle.head];
 
 	//Build paddle
-	for (int i = tail; i <= head; i++)
+	for (int i = paddle.tail; i <= paddle.head; i++)
 		*start_pos++ = i;
 
-	//setup ball initial position
-	ball.x = x - (head / 2);
-	ball.y = y - 2;
+	//setup ball properties
+	ball.x = paddle.x - (paddle.head / 2);
+	ball.y = paddle.y - 2;
+	ball.speed_multiplier = 1;
+
+	// Position = initial position + speed * multiplier
+	ball.velocity = 1 * ball.speed_multiplier;
 
 	ball.symbol = 15; // ☼
+
+	//place ball
 	Field[ball.y][ball.x] = -1;
 }
 
 void print() {
-	const char CHAR_PADDLE = 178; //▓
-	const char CHAR_EMPTY = ' ';
+	const int CHAR_PADDLE = 178; //▓
+	const int CHAR_EMPTY = ' ';
 
 	for (int render_y_pos = 0; render_y_pos < HEIGHT; render_y_pos++) {
-		char curr_ch = 0;
+		unsigned char curr_ch = 0;
 
 		for (int render_x_pos = 0; render_x_pos < WIDTH; render_x_pos++) {
 			int* curr_pixel = *(Field + render_y_pos) + render_x_pos;
@@ -63,7 +84,7 @@ void print() {
 				curr_ch = ball.symbol;
 
 			//Paddle render properties
-			if (*curr_pixel >= tail && *curr_pixel <= head)
+			if (*curr_pixel >= paddle.tail && *curr_pixel <= paddle.head)
 				curr_ch = CHAR_PADDLE;
 
 			printf("%c", curr_ch);
@@ -88,16 +109,18 @@ int handle_input() {
 }
 
 void update() {
+	//this loop looks for tails removes them
 	for (int i = 0; i < HEIGHT; i++) {
 		for (int j = 0; j < WIDTH; j++) {
-			if (Field[i][j] == tail) {
+			if (Field[i][j] == paddle.tail) {
 				Field[i][j] = 0;
 			}
 		}
 	}
 
-	//update new tail
-	tail++;
+	//the tail is calculated by the difference between
+	//tail and head, subtract tail to grow paddle
+	paddle.tail++;
 }
 
 void movement() {
@@ -107,41 +130,83 @@ void movement() {
 
 	switch (var) {
 	case 'a':
-		x--;
-		head++;
-		if (x <= 0) x = 0;
-		Field[y][x] = head;
+		//change cordinate
+		paddle.x--;
+		paddle.head++;
+
+		if (paddle.x <= 0) paddle.x = 0;
+		// summon new paddle part
+		Field[paddle.y][paddle.x] = paddle.head;
+
+		//delete old paddle part
 		update();
 		break;
 	case 'd':
-		x++;
-		head++;
-		Field[y][x] = head;
+		//change cordinate
+		paddle.x++;
+		paddle.head++;
+
+		// summon new paddle part
+		Field[paddle.y][paddle.x] = paddle.head;
+
+		//delete old paddle part
 		update();
 		break;
 	}
+}
 
 
+inline int get_paddle_size() {
+	//subtracted paddle by 1 to compensate for the one being rendered
+	return paddle.head - (paddle.tail - 1);
 }
 
 void update_ball() {
+	//delete old ball
 	Field[ball.y][ball.x] = 0;
 
-	if (ball.y == 1)ball.y++;
-	else ball.y--;
+	//top limit
+	if (ball.y == 0) {
+		ball.velocity = -ball.velocity;
+	}
 
-	if (ball.x == 0)ball.x++;
+	//bottom limit / game over
+	if (ball.y == HEIGHT) {
+		gameover();
+	}
 
-	if (ball.x == WIDTH)
-		ball.x--;
+	//left limit
+	if (ball.x == 0)ball.velocity = -ball.velocity;
 
+	//right limit
+	if (ball.x >= WIDTH - 2)
+		ball.velocity = -ball.velocity;
 
+	//checks hit with paddle
+	int size = get_paddle_size();
+	if (ball.y == paddle.y - 1 && (ball.x >= (paddle.x - size) && ball.x <= paddle.x))
+		ball.velocity = -ball.velocity;
+	//the difference between tail and head is the paddle size
+
+	//change cordinates
+	ball.y -= ball.velocity;
+
+	//summon new ball
 	Field[ball.y][ball.x] = -1;
+}
+
+void gameover() {
+	//end game loop
+	game_status = true;
+
+	//clear screen and show message
+	system("cls");
+	printf("\tGAME OVER ! ! 1! !");
 }
 
 void draw() {
 	print();
-	Sleep(50);
+	Sleep(20);
 	resetscreen();
 }
 
@@ -151,7 +216,6 @@ void input() {
 
 void logic() {
 	update_ball();
-
 }
 
 int
@@ -161,7 +225,6 @@ main()
 	while (game_status == false) {
 		draw();
 		input();
-		Sleep(50);
 		logic();
 	}
 
