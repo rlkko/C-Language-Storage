@@ -11,11 +11,13 @@
 
 #define HEIGHT 30
 #define WIDTH 60
+#define BOX_SIZE 2
 
 //maybe the boxes will be dynamic i can remove and add more?
 typedef struct box {
-	int width;
-	int x, y;
+	int width = BOX_SIZE;
+	bool active = false;
+	int* coord = NULL;
 }Box;
 
 struct {
@@ -60,17 +62,24 @@ void init() {
 
 	//place ball
 	Field[ball.y][ball.x] = -1;
+
+	//TO DO: BOXES, i dont feel like doing it
 }
 
 void print() {
 	const int CHAR_PADDLE = 178; //▓
 	const int CHAR_EMPTY = ' ';
+	const int CHAR_BOX = 251; // ░
 
 	for (int render_y_pos = 0; render_y_pos < HEIGHT; render_y_pos++) {
 		unsigned char curr_ch = 0;
 
 		for (int render_x_pos = 0; render_x_pos < WIDTH; render_x_pos++) {
 			int* curr_pixel = *(Field + render_y_pos) + render_x_pos;
+
+			//box render code ( -2 )
+			if (*curr_pixel == -2)
+				curr_ch = CHAR_BOX;
 
 			//Visual limits for the user
 			if (render_x_pos == WIDTH - 1)
@@ -155,10 +164,18 @@ void movement() {
 	}
 }
 
-
 inline int get_paddle_size() {
 	//subtracted paddle by 1 to compensate for the one being rendered
 	return paddle.head - (paddle.tail - 1);
+}
+
+void gameover() {
+	//end game loop
+	game_status = true;
+
+	//clear screen and show message
+	system("cls");
+	printf("\tGAME OVER ! ! 1! !");
 }
 
 void update_ball() {
@@ -193,15 +210,6 @@ void update_ball() {
 
 	//summon new ball
 	Field[ball.y][ball.x] = -1;
-}
-
-void gameover() {
-	//end game loop
-	game_status = true;
-
-	//clear screen and show message
-	system("cls");
-	printf("\tGAME OVER ! ! 1! !");
 }
 
 void draw() {
