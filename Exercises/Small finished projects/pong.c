@@ -12,6 +12,7 @@
 #define HEIGHT 30
 #define WIDTH 60
 #define BOX_SIZE 2
+#define FPS 50
 
 //maybe the boxes will be dynamic i can remove and add more?
 typedef struct box {
@@ -30,6 +31,9 @@ struct {
 	char symbol;
 } ball;
 
+enum hit_direction { left, right, none };
+hit_direction ball_direction = none;
+
 //general purpose variables
 bool game_status = false;
 int var;
@@ -42,7 +46,7 @@ void init() {
 	paddle.x = WIDTH / 2;
 	paddle.y = HEIGHT - 2;
 	paddle.tail = 1;
-	paddle.head = 5;
+	paddle.head = 6;
 
 	int* start_pos = &Field[paddle.y][paddle.x - paddle.head];
 
@@ -93,7 +97,7 @@ void print() {
 				curr_ch = ball.symbol;
 
 			//Paddle render properties
-			if (*curr_pixel >= paddle.tail && *curr_pixel <= paddle.head)
+			if (*curr_pixel >= paddle.tail && *curr_pixel <= paddle.head + 1)
 				curr_ch = CHAR_PADDLE;
 
 			printf("%c", curr_ch);
@@ -139,9 +143,15 @@ void movement() {
 
 	switch (var) {
 	case 'a':
+
+		//TO DO: MOVE SIZE SPACES TO THE RIGHT AND MAKE COLLISION SYSTEM
 		//change cordinate
 		paddle.x--;
 		paddle.head++;
+
+		//tail--
+		//head--
+		//middle--
 
 		if (paddle.x <= 0) paddle.x = 0;
 		// summon new paddle part
@@ -183,7 +193,7 @@ void update_ball() {
 	Field[ball.y][ball.x] = 0;
 
 	//top limit
-	if (ball.y == 0) {
+	if (ball.y >= 1) {
 		ball.velocity = -ball.velocity;
 	}
 
@@ -193,20 +203,51 @@ void update_ball() {
 	}
 
 	//left limit
-	if (ball.x == 0)ball.velocity = -ball.velocity;
+	if (ball.x >= 1)ball.velocity = -ball.velocity;
 
 	//right limit
 	if (ball.x >= WIDTH - 2)
 		ball.velocity = -ball.velocity;
 
 	//checks hit with paddle
-	int size = get_paddle_size();
-	if (ball.y == paddle.y - 1 && (ball.x >= (paddle.x - size) && ball.x <= paddle.x))
-		ball.velocity = -ball.velocity;
-	//the difference between tail and head is the paddle size
+	const int size = get_paddle_size();
+	const int paddle_left = paddle.x;
+	const int paddle_right = paddle.x - size;
+	const int paddle_middle = paddle.x - (size / 2);
 
-	//change cordinates
+	if (ball.y == paddle.y - 1) {
+		if (ball.x == paddle_middle)
+			ball.velocity = -ball.velocity;
+
+		if (ball.x > paddle_middle && ball.x <= paddle_left) {
+			ball_direction = left;
+			ball.x -= ball.velocity;
+		}
+
+		if (ball.x < paddle_middle && ball.x >= paddle_right) {
+			ball_direction = right;
+			ball.velocity = -ball.velocity;
+		}
+	}
+
+	//change cordinates/puts the ball running
 	ball.y -= ball.velocity;
+
+	switch (ball_direction) {
+	case left:
+		ball.x += ball.velocity;
+		break;
+	case right:
+		ball.x -= ball.velocity;
+		break;
+	}
+
+	if (ball.x == -1 && ball.y == -1)
+	{
+		ball.y = 1;
+		ball.x = 1;
+		ball.velocity = -ball.velocity;
+	}
 
 	//summon new ball
 	Field[ball.y][ball.x] = -1;
@@ -214,7 +255,7 @@ void update_ball() {
 
 void draw() {
 	print();
-	Sleep(20);
+	Sleep(FPS);
 	resetscreen();
 }
 
