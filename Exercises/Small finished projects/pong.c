@@ -2,7 +2,7 @@
 // made by rikko
 #include <stdio.h>
 #include <conio.h>
-#include <ctime>
+#include <ctype.h>
 
 // To clear the screen
 #include <stdlib.h>
@@ -16,7 +16,7 @@
 
 //maybe the boxes will be dynamic i can remove and add more?
 typedef struct box {
-	int width = BOX_SIZE;
+	int width = 2;
 	bool active = false;
 	int* coord = NULL;
 }Box;
