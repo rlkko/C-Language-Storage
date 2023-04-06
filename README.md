@@ -1,6 +1,6 @@
 # 💻 C programming corner
 
-This is the place where i want to show and try to learn from the best the most efficient algorithms
+This is the corner for my C projects
 
 ## 🔧 Contributing
 Pull requests are welcome. I'm always trying to get better as a programmer.
