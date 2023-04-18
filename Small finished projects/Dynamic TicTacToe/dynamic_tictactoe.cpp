@@ -28,10 +28,10 @@ int searchDiagonal(char board[TABLE_SIZE][TABLE_SIZE],char ch){
 
 	
 	for(x = 0, y = TABLE_SIZE-1; x <=TABLE_SIZE-1;x++,y--){
-		if(board[x][y] == ch) 
+		if(board[x][y] == ch && x+y == TABLE_SIZE) 
 			diagonalScore[1]++;
 			
-		if(board[x][x] == ch) 
+		if(board[x][x] == ch && x+y == TABLE_SIZE) 
 			diagonalScore[0]++;
 	}
 
